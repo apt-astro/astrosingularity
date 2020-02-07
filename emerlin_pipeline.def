@@ -1,0 +1,92 @@
+BootStrap: library
+From: ubuntu:18.04
+
+%files
+	casa-pipeline-release-5.6.2-2.el7.tar.gz
+
+%runscript
+	echo "This is what happens when you run the container..."
+	. /conda/etc/profile.d/conda.sh
+	conda activate astroconda
+	ls /eMERLIN_CASA_pipeline
+
+%startscript
+	echo "This is what happens when you start the container...
+	. /conda/etc/profile.d/conda.sh
+	conda activate astroconda
+	ls /eMERLIN_CASA_pipeline
+
+%post
+	#Update and install KERN packages
+	apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get install software-properties-common time -y
+        add-apt-repository -s ppa:kernsuite/kern-5
+        apt-add-repository multiverse
+        apt-add-repository restricted
+        apt-get update
+	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
+        DEBIAN_FRONTEND=noninteractive apt-get install libgtk3* htop glances git apt-utils vim -y
+        DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -y
+        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger carta chgcentre ddfacet factor libidg miriad obit parseltongue pybdsf tirific python-pyfftw python3-pyfftw python-pyfftw-doc python3-pip xvfb -y
+	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget git-lfs bash -y
+        apt-get install -y build-essential cmake gfortran g++ gcc libncurses5-dev libreadline-dev flex bison libblas-dev liblapacke-dev wcslib-dev libcfitsio-dev emacs nano
+        apt-get install -y libhdf5-dev libfftw3-dev python-numpy-dev libboost-python-dev libpython3.6-dev libqt4-dev libpthread-stubs0-dev fort77 pthread* rsync
+	pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose psutil ipywidgets ipyparallel bokeh scikit-learn
+	
+	#Install Anaconda + Astroconda + some additional useful packages
+	export SINGULARITY_SHELL=/bin/bash
+	wget https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O conda.sh
+	bash conda.sh -b -p conda
+	. /conda/etc/profile.d/conda.sh
+	conda update -y -n root conda
+	conda update --all
+	conda config --add channels http://ssb.stsci.edu/astroconda
+	conda create -n astroconda stsci
+	conda install -c conda-forge galsim astromatic-swarp astromatic-source-extractor astromatic-stiff -n astroconda
+	conda install -c pkgw-forge ds9
+	
+	#Prepare CASA
+	tar -zxvf casa-pipeline-release-5.6.2-2.el7.tar.gz
+
+	#Install eMERLIN CASA pipeline, but disable auto-update of "data" directory
+	#to respect the fact that this container is a read-only FS
+	git clone https://github.com/e-merlin/eMERLIN_CASA_pipeline.git
+	sed -i -e 's/"update_casa-data"       : true,/"update_casa-data"       : false,/g' /eMERLIN_CASA_pipeline/default_params.json
+
+	#Update UTC table for CASA
+	#/casa-release-5.5.0-149.el7/bin/casa-config --exec update-data	
+	rsync -avz rsync://casa-rsync.nrao.edu/casa-data /casa-pipeline-release-5.6.2-2.el7/data
+
+	#Download and untar the analysis_utils package
+	wget ftp://ftp.cv.nrao.edu/pub/casaguides/analysis_scripts.tar
+	tar -xvf analysis_scripts.tar -C /
+
+	#Clear up any old installation files
+	rm -r conda.sh analysis_scripts.tar casa-pipeline-release-5.6.2-2.el7.tar.gz
+	DEBIAN_FRONTEND=noninteractive apt autoremove -y
+
+	
+%test
+	. /conda/etc/profile.d/conda.sh
+	conda activate astroconda
+	python --version
+	
+%environment
+	export LC_ALL=C
+	export LC_CTYPE="en_US.UTF-8"
+	unset XDG_RUNTIME_DIR
+
+	export PATH="/home/alasdair/bin/anaconda3/bin:$PATH"
+	export PATH=/casa-pipeline-release-5.6.2-2.el7/bin:$PATH
+	export PYTHONPATH="$CASAROOT/$CASA_ARCH/lib/python2.7/:$PYTHONPATH"
+	export LD_LIBRARY_PATH="$CASAROOT/$CASA_ARCH/lib:$LD_LIBRARY_PATH"
+	export CASA_ENABLE_TELEMETRY=false
+
+	#source activate astroconda
+	
+	#Xvfb :99 &
+	#export DISPLAY=:99
+	
+%labels
+	Author: Alasdair Thomson
+	Version: 0.5
