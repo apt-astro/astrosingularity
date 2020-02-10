@@ -3,20 +3,51 @@ From: ubuntu:18.04
 
 %files
 	casa-pipeline-release-5.6.2-2.el7.tar.gz
+	run_emerlin_pipeline.bash
+
+%help
+	There are two main ways to interact with this container:
+
+	[1] > singularity shell eMERLIN_CASA_pipeline.img
+
+	This opens up an interactive shell within the container. You can use this mode to copy the inputs.ini and default_params.json file to the working directory in order to edit them for a custom pipeline run:
+
+	> cp /eMERLIN_CASA_pipeline/inputs.ini .
+	> cp /eMERLIN_CASA_pipeline/default_params.json .
+
+	The pipeline can then be called from within this interactive shell using the standard syntax, e.g.
+
+	> casa -c /eMERLIN_CASA_pipeline -r all
+
+
+
+	[2] > singularity run eMERLIN_CASA_pipeline.img
+
+	This begins a completely automated, headless pipeline run using either (a) the inputs.ini and default_params.json files located in the current directory, provided these exist, or (b) the default inputs.ini and default_params.json files that come with the pipeline.
+
+	This is the preferred mode of interacting the pipeline if you with to use machines without X11 installed (i.e. SLURM-managed HPC nodes), and requires you to provide an appropriate inputs.ini file at the time of execution.
+
+	In this mode, the eMERLIN_CASA_pipeline.img needs to be located in the same directory as inputs.ini and in the same directory as the eMERLIN FITS-IDI file you wish to process. After the run, a directory called "pipelined" will be created, in which the results of your pipeline run are stored.
+
 
 %runscript
 	echo "This is what happens when you run the container..."
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	ls /eMERLIN_CASA_pipeline
+	xvfb-run bash run_emerlin_pipeline.bash
 
 %startscript
 	echo "This is what happens when you start the container...
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	ls /eMERLIN_CASA_pipeline
+	echo "Your mother was a hamster and your father smelled of eldeberries"
 
 %post
+	export CASASTRING=casa-pipeline-release-5.6.2-2.el7
+
+	#Download CASA
+	wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASASTRING.tar.gz
+
 	#Update and install KERN packages
 	apt-get update
         DEBIAN_FRONTEND=noninteractive apt-get install software-properties-common time -y
@@ -46,7 +77,7 @@ From: ubuntu:18.04
 	conda install -c pkgw-forge ds9
 	
 	#Prepare CASA
-	tar -zxvf casa-pipeline-release-5.6.2-2.el7.tar.gz
+	tar -zxvf $CASASTRING.tar.gz
 
 	#Install eMERLIN CASA pipeline, but disable auto-update of "data" directory
 	#to respect the fact that this container is a read-only FS
@@ -54,15 +85,20 @@ From: ubuntu:18.04
 	sed -i -e 's/"update_casa-data"       : true,/"update_casa-data"       : false,/g' /eMERLIN_CASA_pipeline/default_params.json
 
 	#Update UTC table for CASA
-	#/casa-release-5.5.0-149.el7/bin/casa-config --exec update-data	
-	rsync -avz rsync://casa-rsync.nrao.edu/casa-data /casa-pipeline-release-5.6.2-2.el7/data
+	rsync -avz rsync://casa-rsync.nrao.edu/casa-data /$CASASTRING/data
+
+	#Set the immutable /casa/data directory to be a symlink that points to the current directory
+	#mkdir casa-data
+	#mv /$CASASTRING/data/* ./casa-data
+	#rmdir /$CASASTRING/data
+	#ln -s ./casa-data /$CASASTRING/data
 
 	#Download and untar the analysis_utils package
 	wget ftp://ftp.cv.nrao.edu/pub/casaguides/analysis_scripts.tar
 	tar -xvf analysis_scripts.tar -C /
 
 	#Clear up any old installation files
-	rm -r conda.sh analysis_scripts.tar casa-pipeline-release-5.6.2-2.el7.tar.gz
+	rm -r conda.sh analysis_scripts.tar $CASASTRING.tar.gz
 	DEBIAN_FRONTEND=noninteractive apt autoremove -y
 
 	
@@ -77,16 +113,12 @@ From: ubuntu:18.04
 	unset XDG_RUNTIME_DIR
 
 	export PATH="/home/alasdair/bin/anaconda3/bin:$PATH"
-	export PATH=/casa-pipeline-release-5.6.2-2.el7/bin:$PATH
+	export PATH=/$CASASTRING/bin:$PATH
 	export PYTHONPATH="$CASAROOT/$CASA_ARCH/lib/python2.7/:$PYTHONPATH"
 	export LD_LIBRARY_PATH="$CASAROOT/$CASA_ARCH/lib:$LD_LIBRARY_PATH"
 	export CASA_ENABLE_TELEMETRY=false
 
-	#source activate astroconda
-	
-	#Xvfb :99 &
-	#export DISPLAY=:99
 	
 %labels
 	Author: Alasdair Thomson
-	Version: 0.5
+	Version: 1.0
