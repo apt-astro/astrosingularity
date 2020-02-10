@@ -2,7 +2,7 @@ BootStrap: library
 From: ubuntu:18.04
 
 %files
-	casa-pipeline-release-5.6.2-2.el7.tar.gz
+	#casa-pipeline-release-5.6.2-2.el7.tar.gz
 	run_emerlin_pipeline.bash
 
 %help
@@ -17,17 +17,24 @@ From: ubuntu:18.04
 
 	The pipeline can then be called from within this interactive shell using the standard syntax, e.g.
 
-	> casa -c /eMERLIN_CASA_pipeline -r all
+	> casa -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -r all
 
+	See instructions on Javier Moldon's GitHub page for more details:
+
+	**************************************************
+	https://github.com/e-merlin/eMERLIN_CASA_pipeline
+	**************************************************
 
 
 	[2] > singularity run eMERLIN_CASA_pipeline.img
 
 	This begins a completely automated, headless pipeline run using either (a) the inputs.ini and default_params.json files located in the current directory, provided these exist, or (b) the default inputs.ini and default_params.json files that come with the pipeline.
 
-	This is the preferred mode of interacting the pipeline if you with to use machines without X11 installed (i.e. SLURM-managed HPC nodes), and requires you to provide an appropriate inputs.ini file at the time of execution.
+	This is the preferred mode of interacting with the pipeline if you wish to use machines without X11 installed (i.e. SLURM-managed HPC nodes), and requires you to provide an appropriate inputs.ini file at the time of execution.
 
-	In this mode, the eMERLIN_CASA_pipeline.img needs to be located in the same directory as inputs.ini and in the same directory as the eMERLIN FITS-IDI file you wish to process. After the run, a directory called "pipelined" will be created, in which the results of your pipeline run are stored.
+	In this mode, the eMERLIN_CASA_pipeline.img should be located in the same directory as inputs.ini and in the same directory as the eMERLIN FITS-IDI file you wish to process. The inputs.ini file should have "fits_path" set to "./".
+
+	After the run, a tar file called "pipelined.tar.gz" is created, containing the results of the pipeline run and all associated weblog files.
 
 
 %runscript
@@ -40,13 +47,10 @@ From: ubuntu:18.04
 	echo "This is what happens when you start the container...
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	echo "Your mother was a hamster and your father smelled of eldeberries"
+	echo "You have started the container!"
 
 %post
 	export CASASTRING=casa-pipeline-release-5.6.2-2.el7
-
-	#Download CASA
-	wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASASTRING.tar.gz
 
 	#Update and install KERN packages
 	apt-get update
@@ -76,7 +80,8 @@ From: ubuntu:18.04
 	conda install -c conda-forge galsim astromatic-swarp astromatic-source-extractor astromatic-stiff -n astroconda
 	conda install -c pkgw-forge ds9
 	
-	#Prepare CASA
+	#Prepare and install CASA
+	wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASASTRING.tar.gz
 	tar -zxvf $CASASTRING.tar.gz
 
 	#Install eMERLIN CASA pipeline, but disable auto-update of "data" directory
