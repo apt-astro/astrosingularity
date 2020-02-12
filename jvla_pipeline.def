@@ -3,45 +3,31 @@ From: ubuntu:18.04
 
 %files
 	#casa-pipeline-release-5.6.2-2.el7.tar.gz
-	run_emerlin_pipeline.bash
+	jvla_pipe.py
 
 %help
 	There are two main ways to interact with this container:
 
-	[1] > singularity shell eMERLIN_CASA_pipeline.img
+	[1] > singularity shell JVLA_CASA_pipeline.img
 
-	This opens up an interactive shell within the container. You can use this mode to copy the inputs.ini and default_params.json file to the working directory in order to edit them for a custom pipeline run:
+	This opens up an interactive shell within the container. You can use this mode to run the pipeline as normal:
 
-	> cp /eMERLIN_CASA_pipeline/inputs.ini .
-	> cp /eMERLIN_CASA_pipeline/default_params.json .
-
-	The pipeline can then be called from within this interactive shell using the standard syntax, e.g.
-
-	> casa -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -r all
-
-	See instructions on Javier Moldon's GitHub page for more details:
-
-	**************************************************
-	https://github.com/e-merlin/eMERLIN_CASA_pipeline
-	**************************************************
+	> casa --pipeline
+	> import pipeline.recipes.hifv as hifv
+	> hifv.hifv(['Your_SDM_File'])
 
 
-	[2] > singularity run eMERLIN_CASA_pipeline.img
+	[2] > singularity run JVLA_CASA_pipeline.img
 
-	This begins a completely automated, headless pipeline run using either (a) the inputs.ini and default_params.json files located in the current directory, provided these exist, or (b) the default inputs.ini and default_params.json files that come with the pipeline.
+	This begins a completely automated, headless pipeline run.
 
 	This is the preferred mode of interacting with the pipeline if you wish to use machines without X11 installed (i.e. SLURM-managed HPC nodes), and requires you to provide an appropriate inputs.ini file at the time of execution.
-
-	In this mode, the eMERLIN_CASA_pipeline.img should be located in the same directory as inputs.ini and in the same directory as the eMERLIN FITS-IDI file you wish to process. The inputs.ini file should have "fits_path" set to "./".
-
-	After the run, a tar file called "pipelined.tar.gz" is created, containing the results of the pipeline run and all associated weblog files.
-
 
 %runscript
 	echo "This is what happens when you run the container..."
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	xvfb-run bash /run_emerlin_pipeline.bash
+	xvfb-run casa --nologger --log2term --pipeline -c /jvla_pipe.py
 
 %startscript
 	echo "This is what happens when you start the container...
@@ -84,19 +70,8 @@ From: ubuntu:18.04
 	wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASASTRING.tar.gz
 	tar -zxvf $CASASTRING.tar.gz
 
-	#Install eMERLIN CASA pipeline, but disable auto-update of "data" directory
-	#to respect the fact that this container is a read-only FS
-	git clone https://github.com/e-merlin/eMERLIN_CASA_pipeline.git
-	sed -i -e 's/"update_casa-data"       : true,/"update_casa-data"       : false,/g' /eMERLIN_CASA_pipeline/default_params.json
-
 	#Update UTC table for CASA
 	rsync -avz rsync://casa-rsync.nrao.edu/casa-data /$CASASTRING/data
-
-	#Set the immutable /casa/data directory to be a symlink that points to the current directory
-	#mkdir casa-data
-	#mv /$CASASTRING/data/* ./casa-data
-	#rmdir /$CASASTRING/data
-	#ln -s ./casa-data /$CASASTRING/data
 
 	#Download and untar the analysis_utils package
 	wget ftp://ftp.cv.nrao.edu/pub/casaguides/analysis_scripts.tar
