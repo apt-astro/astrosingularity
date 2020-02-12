@@ -1,0 +1,21 @@
+BootStrap: docker
+From: sl:7
+
+%post
+	 yum -y update
+         yum -y upgrade
+	 yum -y install gsl* lib64gsl*
+	 yum -y install yum-utils ca-certificates yum-conf-repos
+	 yum -y install yum-conf-epel
+	 yum -y install epel-release
+	 yum-config-manager --add-repo=ftp://ftp.eso.org/scisoft/repositories/sl/scisoft.repo
+	 yum -y groupinstall scisoft
+	 PATH="/scisoft/bin:$PATH"
+	 wget http://www.jb.man.ac.uk/~athomson/DATA/libgsl.so.0 --directory-prefix=$SINGULARITY_ROOTFS/usr/lib
+	 yum-config-manager --add-repo=ftp://ftp.eso.org/pub/dfs/pipelines/repositories/stable/sl/esorepo.repo
+	 yum -y update
+         yum -y upgrade
+	 yum install -y esopipe-muse-all
+
+%labels
+	Author: Alasdair Thomson

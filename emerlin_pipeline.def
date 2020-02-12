@@ -41,7 +41,7 @@ From: ubuntu:18.04
 	echo "This is what happens when you run the container..."
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	xvfb-run bash /run_emerlin_pipeline.bash
+	xvfb-run --auto-servernum bash /run_emerlin_pipeline.bash
 
 %startscript
 	echo "This is what happens when you start the container...

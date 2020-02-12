@@ -1,0 +1,19 @@
+BootStrap: library
+From: ubuntu:18.04
+
+
+%post
+	apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get install software-properties-common -y
+        add-apt-repository -s ppa:kernsuite/kern-5
+        apt-add-repository multiverse
+        apt-add-repository restricted
+        apt-get update
+	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
+        DEBIAN_FRONTEND=noninteractive apt-get install libgtk3* htop glances git apt-utils -y
+        DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -y
+        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger python-casacore carta python3-casacore chgcentre ddfacet factor libidg miriad obit parseltongue pybdsf tirific python-pyfftw python3-pyfftw python-pyfftw-doc -y
+	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget bash -y
+
+%labels
+	Author: Alasdair Thomson
