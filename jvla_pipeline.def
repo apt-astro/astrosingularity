@@ -2,8 +2,7 @@ BootStrap: library
 From: ubuntu:18.04
 
 %files
-	#casa-pipeline-release-5.6.2-2.el7.tar.gz
-	jvla_pipe.py
+	run_jvla_pipeline.py
 
 %help
 	There are two main ways to interact with this container:
@@ -27,7 +26,7 @@ From: ubuntu:18.04
 	echo "This is what happens when you run the container..."
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	xvfb-run --auto-servernum casa --nologger --log2term --pipeline -c /jvla_pipe.py
+	xvfb-run --auto-servernum casa --nologger --log2term --pipeline -c /run_jvla_pipeline.py
 
 %startscript
 	echo "This is what happens when you start the container...
