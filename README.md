@@ -7,11 +7,15 @@ This repository contains some useful(?) build scripts for Singularity containers
 2. ___emerlin\_pipeline.def___ Contains many of the KERN packages, but additionally includes a full install of CASA (https://casa.nrao.edu/ -- currently v5.6.2-2) along with Javier Moldon's eMERLIN CASA pipeline (https://github.com/e-merlin/eMERLIN_CASA_pipeline). Please see the README on Javier's github page for detailed instructions on how to use the pipeline. 
 3. ___jvla\_pipeline.def___ Another variant of the KERN + CASA image, with an additional Python control script to enable automated processing of VLA data using the NRAO VLA CASA pipeline (https://science.nrao.edu/facilities/vla/data-processing/pipeline).
 
-These images contain largely similar sets of software packages - the chief differences between them are in the behaviour of the command:
+Each of these containers can be built with Singularity (version >= 3.0.0) using (e.g.)
+
+> sudo singularity build [imagename] emerlin\_pipeline.def
+
+Where "[imagename]" is an arbitrary name of your choosing. These container  images contain largely overlapping sets of software packages - the chief differences between them are in the behaviour of the command:
 
 > singularity run [imagename]
 
-with ___emerlin\_pipeline.def___ automatically scripting and initialising an eMERLIN calibration run, and ___jvla\_pipeline.def___ scripting and initialising a VLA calibration run. Further information on how to use these images are to be found in the respective %help sections of each build script, and can be called from the built Singularity container image using
+with ___emerlin\_pipeline.def___ automatically scripting and initialising an eMERLIN calibration run, and ___jvla\_pipeline.def___ scripting and initialising a VLA calibration run. Further information on how to use these images are to be found in the respective %help sections of each build script. These can also be called from the built Singularity container image using
 
 > singularity run-help [imagename]
 
@@ -29,7 +33,7 @@ If you are in possession of raw eMERLIN FITS-IDI files and wish to process them,
 	
 3. Now that you know which sources are which, I would recommend deleting all files generated from this initial run:
 
-	> [REMOVE QUOTE GOES HERE]
+	> rm -rf *.ms weblog/ \*last \*.log
 	
 	and then dump out a pipeline parameter file from the Singularity container using:
 	
