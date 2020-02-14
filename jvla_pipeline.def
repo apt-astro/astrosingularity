@@ -3,6 +3,7 @@ From: ubuntu:18.04
 
 %files
 	run_jvla_pipeline.py
+	run_jvla_pipeline.bash
 
 %help
 	There are two main ways to interact with this container:
@@ -23,10 +24,9 @@ From: ubuntu:18.04
 	This is the preferred mode of interacting with the pipeline if you wish to use machines without X11 installed (i.e. SLURM-managed HPC nodes), and requires you to provide an appropriate inputs.ini file at the time of execution.
 
 %runscript
-	echo "This is what happens when you run the container..."
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	xvfb-run --auto-servernum casa --nologger --log2term --pipeline -c /run_jvla_pipeline.py
+	bash run_jvla_pipeline.bash
 
 %startscript
 	echo "This is what happens when you start the container...

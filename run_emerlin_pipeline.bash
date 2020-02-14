@@ -1,5 +1,7 @@
+while read -r line; do CORES="$line"; done < ncores.txt
 rm -r *.ms *.log *.flagversions weblog splits logs pre-cal_flag_stats.txt
-casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -r all -i inputs.ini
+#casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -r all -i inputs.ini
+mpicasa -n $CORES /casa-pipeline-release-5.6.2-2.el7/bin/casa --nogui --pipeline -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -r all -i inputs.ini
 mkdir pipelined
 mv *log pipelined
 mv *.ms pipelined

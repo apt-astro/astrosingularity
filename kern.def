@@ -10,10 +10,12 @@ From: ubuntu:18.04
         apt-add-repository restricted
         apt-get update
 	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
-        DEBIAN_FRONTEND=noninteractive apt-get install libgtk3* htop glances git apt-utils -y
+        DEBIAN_FRONTEND=noninteractive apt-get install libgtk3* htop python3.7 glances git apt-utils -y
         DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -y
-        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger python-casacore carta python3-casacore chgcentre ddfacet factor libidg miriad obit parseltongue pybdsf tirific python-pyfftw python3-pyfftw python-pyfftw-doc -y
-	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget bash -y
+        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger python-casacore carta python3-casacore chgcentre ddfacet factor libidg miriad obit parseltongue pybdsf tirific python-pyfftw python3-pyfftw python3-pip python-pyfftw-doc -y
+	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget bash dysco -y
+	pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose psutil ipywidgets ipyparallel bokeh scikit-learn
+
 
 %labels
 	Author: Alasdair Thomson

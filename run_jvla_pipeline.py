@@ -10,7 +10,7 @@ os.system("rm -r "+fileuntar[0])
 #Identify the target field, split out (5s averaging) and tar up
 listfile = glob.glob('pipeline-*/*/*/*/*listobs.txt')[0]
 f = open(listfile, "r")
-outfile = open('split_calibrated.py', "w")
+#outfile = open('split_calibrated.py', "w")
 fieldnames = []
 fieldids = []
 aftermin = 0
@@ -34,16 +34,15 @@ for line in f:
                 fieldnames.append(str(chars[2]))
 
 for i in range(0,len(fieldnames)):
-    print('split(vis="'+fileuntar[0]+'.ms",outputvis="'+fieldnames[i]+'_'+obsdate[0]+'.ms",keepmms=True,field="'+fieldids[i]+'",spw="",scan="",antenna="",correlation="",timerange="",intent="",array="",uvrange="",observation="",feed="",datacolumn="corrected",keepflags=True,width=2,timebin="5s",combine="")')
-                #print(line)
-                #outfile.write(line)
-outfile.close()
+    split(vis=fileuntar[0]+".ms",outputvis=fieldnames[i]+"_"+obsdate[0]+".ms",keepmms=False,field=fieldids[i],spw="",scan="",antenna="",correlation="",timerange="",intent="",array="",uvrange="",observation="",feed="",datacolumn="corrected",keepflags=True,width=2,timebin="5s",combine="")
+                
+#outfile.close()
 
 #Tar up the output files along with the logs
 projectcode = fileuntar[0].split('.')
-os.system("tar -zcvf "+projectcode+"_"+obsdate[0]+"_logs.tar.gz pipeline-*/")
+os.system("tar -zcvf "+str(projectcode[0])+"_"+str(obsdate[0])+"_logs.tar.gz pipeline-*/")
 for i in range(0,len(fieldnames)):
-    os.system('tar -zcvf '+fieldnames[i]+'_'+obsdate[0]+'.ms.tar.gz '+fieldnames[i]+'_'+obsdate[0]+'.ms&')
+    os.system('tar -zcvf '+str(fieldnames[i])+'_'+str(obsdate[0])+'.ms.tar.gz '+str(fieldnames[i])+'_'+str(obsdate[0])+'.ms')
 
 #Clear up everything else
-os.system('rm -r '+fileuntar[0]+'.ms pipeline-* *.log *.last oussid* finalcalibrators.ms flux* *flagversions *hifv* *txt')
+os.system('rm -r '+str(fileuntar[0])+'.ms pipeline-* *.log *.last oussid* finalcalibrators.ms flux* *flagversions *hifv* *txt calibrators.ms *.tmp *.png')
