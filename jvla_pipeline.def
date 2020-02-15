@@ -26,7 +26,7 @@ From: ubuntu:18.04
 %runscript
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	bash run_jvla_pipeline.bash
+	bash /run_jvla_pipeline.bash
 
 %startscript
 	echo "This is what happens when you start the container...
