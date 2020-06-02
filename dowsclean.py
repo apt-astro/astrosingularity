@@ -6,8 +6,8 @@ import getpass
 username = getpass.getuser()
 
 #Find the eMCP.log file and open it to measure the central frequency
-logfile = glob.glob('/state/partition1/'+str(username)+'/**/eMCP.log', recursive=True)
-
+logfile = glob.glob('/workingdir/eMCP.log', recursive=True)
+    
 with open(logfile[0], 'r') as log:
     line = log.readline()
     count = 0
