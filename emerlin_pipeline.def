@@ -3,6 +3,10 @@ From: ubuntu:18.04
 
 %files
 	run_emerlin_pipeline.bash
+	dowsclean.py
+	default_params_WIDE.json
+	default_params_LOWMEM.json
+	default_params_NODROPOUT.json
 
 %help
 	There are two main ways to interact with this container:
@@ -101,6 +105,13 @@ From: ubuntu:18.04
 	#Clear up any old installation files
 	rm -r conda.sh analysis_scripts.tar $CASASTRING.tar.gz
 	DEBIAN_FRONTEND=noninteractive apt autoremove -y
+
+	#Add custom WSCLEAN script
+	mkdir /scripts
+	cp dowsclean.py /scripts
+	cp default_params_WIDE.json /scripts	
+	cp default_params_LOWMEM.json /scripts
+	cp default_params_NODROPOUT.json /scripts	
 
 	
 %test
