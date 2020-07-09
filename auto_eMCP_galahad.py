@@ -80,7 +80,7 @@ def write_export_script(run):
             add_command = write_additional_export(run, s, outfile)
             f.write(add_command+'\n')
     f.write('cp -pr {0}/inputs.ini {1}\n'.format(pipeline_path, output_dir))
-    f.write('cp -pr {0}/default_params.json {1}\n'.format(pipeline_path, output_dir))
+    #f.write('cp -pr {0}/default_params.json {1}\n'.format(pipeline_path, output_dir))
     data_path = fits_path+project+'/'+subproject+'/DATA/'
     f.write("sed -i \'s/project_name/{0}/g\' {1}\n".format(subproject, output_dir+'inputs.ini'))
     f.write("sed -i \'s/\/path\/to\/fits\/files\//{0}/g\' {1}\n".format('\/raw_data\/', output_dir+'inputs.ini'))
@@ -106,8 +106,8 @@ def write_export_script(run):
     f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.ms\n")
     f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.flagversions\n")
     f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/splits/\n")
-    f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+".tar", outbase+"/\n"))
-    f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+"/", outbase+"/\n"))
+    f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+".tar", outbase))
+    f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+"/", outbase))
     f.write("rm -r "+fits_path+project+"/"+subproject+"\n")
     f.close()
     return
