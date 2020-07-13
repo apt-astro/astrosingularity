@@ -84,6 +84,11 @@ def write_export_script(run):
     data_path = fits_path+project+'/'+subproject+'/DATA/'
     f.write("sed -i \'s/project_name/{0}/g\' {1}\n".format(subproject, output_dir+'inputs.ini'))
     f.write("sed -i \'s/\/path\/to\/fits\/files\//{0}/g\' {1}\n".format('\/raw_data\/', output_dir+'inputs.ini'))
+    source_tag = ['target_name','phscal_name','fluxcal_name','bpcal_name','ptcal_name']
+    for s in source_tag:
+        name = run[s]
+        f.write("sed -i \'s/{0}/{1}/g\' {2}\n".format(s, name, output_dir+'inputs.ini'))
+    
     f.write('touch {0}/export_finished\n'.format(output_dir))
     #Set up SLURM script for Galahad
     f.write('wget https://raw.githubusercontent.com/apt-astro/astrosingularity/master/galahad_job_script.sbatch -O '+fits_path+project+'/'+subproject+'.sbatch\n')
@@ -91,6 +96,7 @@ def write_export_script(run):
     f.write("sed -i -e 's/USERID/emadmin/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/PROJID/"+subproject+"/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/DATADIR/{0}/g' {1}.sbatch\n".format(str('/share/nas/emadmin/'+project+'/'+subproject+'/DATA/').replace('/','\/'), fits_path+project+'/'+subproject))
+    f.write("chmod -R 777 "+fits_path+project+"/")
     f.close()
     #Create script for moving data to NAS drive
     if project[0] == 'C' and project[1] == 'Y':
@@ -100,16 +106,20 @@ def write_export_script(run):
             outbase = '/share/nas2/emerlin/external2/CY'+project[2]+project[3]+'/'+project
     if project[0] == 'L' and project[1] == 'E':
         outbase = '/share/nas2/emerlin/external2/LEGACY/'+project
-    #THESE ARE ALL ECHO COMMANDS
-    f = open(fits_path+project+'/'+subproject+'_to_nas.bash', 'wb')
-    f.write("mkdir -p "+outbase+"\n")
-    f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.ms\n")
-    f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.flagversions\n")
-    f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/splits/\n")
-    f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+".tar", outbase))
-    f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+"/", outbase))
-    f.write("rm -r "+fits_path+project+"/"+subproject+"\n")
-    f.close()
+    #Commands to move the processed data back to the NAS drive.
+    if len(outbase) >0:
+        os.system('mkdir -p '+fits_path+project+'/')
+        f = open(fits_path+project+'/'+subproject+'_to_nas.bash', 'wb')
+        f.write("mkdir -p "+outbase+"\n")
+        f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.ms\n")
+        f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.flagversions\n")
+        f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/splits/\n")
+        f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+".tar", outbase))
+        f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+"/", outbase))
+        f.write("rm -r "+fits_path+project+"/"+subproject+"\n")
+        f.close()
+    else:
+        print "There was a problem setting outbase - the script for moving data to the NAS drive has not been created."
     return
 
 def write_run_pipeline(run):
@@ -128,6 +138,7 @@ def write_run_pipeline(run):
 
 
 def run_auto(runs):
+    print "There are "+str(len(runs))+" runs"
     # Prepare scripts 
     for run in runs:
         if run['do_prepare_1']:
@@ -136,9 +147,12 @@ def run_auto(runs):
             write_run_pipeline(run)
             #os.system('sh '+ prepare_script)
     # Export data
+    print "EXPORT BEGINS"
     for run in runs:
+        print "Exporting data for "+str(run)
         if run['do_exports_2']:
             export_script = 's2_exports_'+run['subproject']+'.sh'
+            print "Running the export script now"
             os.system('sh '+export_script)
             #sys.exit('Debugging')
         
