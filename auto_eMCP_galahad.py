@@ -92,7 +92,7 @@ def write_export_script(run):
     f.write('touch {0}/export_finished\n'.format(output_dir))
     #Set up SLURM script for Galahad
     f.write('wget https://raw.githubusercontent.com/apt-astro/astrosingularity/master/galahad_job_script.sbatch -O '+fits_path+project+'/'+subproject+'.sbatch\n')
-    f.write("sed -i -e 's/EMAIL/"+emailaddr+"/g' "+fits_path+project+'/'+subproject+".sbatch\n")
+    f.write("sed -i -e 's/MYEMAIL/"+emailaddr+"/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/USERID/emadmin/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/PROJID/"+subproject+"/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/DATADIR/{0}/g' {1}.sbatch\n".format(str('/share/nas/emadmin/'+project+'/'+subproject+'/DATA/').replace('/','\/'), fits_path+project+'/'+subproject))

@@ -2,7 +2,6 @@ BootStrap: library
 From: ubuntu:18.04
 
 %files
-	run_emerlin_pipeline.bash
 	dowsclean.py
 	default_params_WIDE.json
 	default_params_LOWMEM.json
@@ -68,7 +67,8 @@ From: ubuntu:18.04
 	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget git-lfs bash -y
         apt-get install -y build-essential cmake gfortran g++ gcc libncurses5-dev libreadline-dev flex bison libblas-dev liblapacke-dev wcslib-dev libcfitsio-dev emacs nano
         apt-get install -y libhdf5-dev libfftw3-dev python-numpy-dev libboost-python-dev libpython3.6-dev libqt4-dev libpthread-stubs0-dev fort77 pthread* rsync
-	pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose psutil ipywidgets ipyparallel bokeh scikit-learn
+	apt-get install -y nvidia-smi
+	pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose psutil ipywidgets ipyparallel bokeh scikit-learn gpustat
 	
 	#Install Anaconda + Astroconda + some additional useful packages
 	export SINGULARITY_SHELL=/bin/bash
