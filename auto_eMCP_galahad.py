@@ -104,6 +104,11 @@ def write_export_script(run):
             outbase = '/share/nas/emerlin/external/CY'+project[2]+'/'+project
         else:
             outbase = '/share/nas2/emerlin/external2/CY'+project[2]+project[3]+'/'+project
+    if project[0] == 'D' and project[1] == 'D':
+        if project[2] in '123456789' and len(project) == 6:
+            outbase = '/share/nas/emerlin/external/CY'+project[2]+'/'+project
+        else:
+            outbase = '/share/nas2/emerlin/external2/CY'+project[2]+project[3]+'/'+project
     if project[0] == 'L' and project[1] == 'E':
         outbase = '/share/nas2/emerlin/external2/LEGACY/'+project
     #Commands to move the processed data back to the NAS drive.
@@ -111,12 +116,19 @@ def write_export_script(run):
         os.system('mkdir -p '+fits_path+project+'/')
         f = open(fits_path+project+'/'+subproject+'_to_nas.bash', 'wb')
         f.write("mkdir -p "+outbase+"\n")
-        f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.ms\n")
-        f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/*.flagversions\n")
+        f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/"+subproject+"/*.ms\n")
+        f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/"+subproject+"/*.flagversions\n")
         f.write("rm -r "+fits_path+project+"/"+subproject+"/DATA/splits/\n")
-        f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+".tar", outbase))
-        f.write("mv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+"/", outbase))
-        f.write("rm -r "+fits_path+project+"/"+subproject+"\n")
+        f.write("if [ -d "+outbase+"/"+subproject+" ]; then\n")
+        f.write('\techo -e "\e35mA dataset with a conflicting name already exists on the NAS drive:"\n')
+        f.write('\techo -e "'+outbase+'/'+subproject+'"\n')
+        f.write('\techo -e "Please inspect its contents and decide for yourself which version to keep. I will *NOT* copy the updated directory from Galahad\e[0m"\n')
+        f.write("else\n")
+        f.write('\techo -e "The distribution NAS drive has no conflicting dataset. I will now move the data from Galahad on to the external NAS drive."\n')
+        f.write("\tmv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+".tar", outbase))
+        f.write("\tmv {0} {1}\n".format(fits_path+project+"/"+subproject+"/DATA/"+subproject+"/", outbase))
+        f.write("\trm -r "+fits_path+project+"/"+subproject+"\n")
+        f.write("fi")    
         f.close()
     else:
         print "There was a problem setting outbase - the script for moving data to the NAS drive has not been created."
