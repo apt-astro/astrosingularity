@@ -82,7 +82,7 @@ f = open("wsclean_commands.bash", "w")
 f.write("#WSCLEAN commands for calibrator fields:\n")
 for i in range(0,len(fieldids)):
     if fieldcode[i] != 'TARGET':
-        f.write('wsclean -name '+str(msroot)+'_'+str(fieldnames[i])+' -field '+str(fieldids[i])+' -size 14000 14000 -scale 0.015asec -weight natural -gain 0.10 -mgain 0.65 -auto-mask 3.0 -auto-threshold 0.5 -parallel-deconvolution 4000 -local-rms -local-rms-window 120 -local-rms-method rms-with-min -no-update-model-required -log-time -niter 75000 -temp-dir /state/partition2/'+str(username)+' '+str(msname)+'\n')
+        f.write('wsclean -name '+str(msroot)+'_'+str(fieldnames[i])+' -field '+str(fieldids[i])+' -size 14000 14000 -scale '+str(scale)+'asec -weight natural -gain 0.10 -mgain 0.65 -auto-mask 3.0 -auto-threshold 0.5 -parallel-deconvolution 4000 -local-rms -local-rms-window 120 -local-rms-method rms-with-min -no-update-model-required -log-time -niter 75000 -temp-dir /state/partition2/'+str(username)+' '+str(msname)+'\n')
 
 f.close()
 
