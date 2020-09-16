@@ -25,7 +25,8 @@ export PROJECT=PROJID
 export DATAIN=DATADIR
 export DATAOUT="$DATAIN"
 export STEPS=all #Usual parameter to determine which pipeline steps to run, e.g. all, pre_processing, calibration, etc. Currently only "all" is supported
-export MAKEWIDEFIELD=True #Image the primary beam using wsclean
+export MAKEWIDEFIELD=True #Image the target field out to the primary beam using wsclean
+export IMAGECALIBRATORS=False #Image the calibrator sources
 
 #Execute the pipeline using these input parameters
 #(DO NOT EDIT BELOW THIS LINE)
