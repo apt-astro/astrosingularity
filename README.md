@@ -2,7 +2,7 @@
 
 This repository contains some useful(?) build scripts for Singularity containers used in the processing of (mostly radio) astronomical data. 
 
-##Container images
+## Container images
 1. ___kerndef.def___ Contains some of the radio astronomy software packages I use most frequently from Gijs Molenaar's KERN Suite (https://kernsuite.info/).
 2. ___emerlin\_pipeline.def___ Contains many of the KERN packages, but additionally includes a full install of CASA (https://casa.nrao.edu/ -- currently v5.6.2-2) along with Javier Moldon's eMERLIN CASA pipeline (https://github.com/e-merlin/eMERLIN_CASA_pipeline). Please see the README on Javier's github page for detailed instructions on how to use the pipeline. 
 3. ___jvla\_pipeline.def___ Another variant of the KERN + CASA image, with an additional Python control script to enable automated processing of VLA data using the NRAO VLA CASA pipeline (https://science.nrao.edu/facilities/vla/data-processing/pipeline).
