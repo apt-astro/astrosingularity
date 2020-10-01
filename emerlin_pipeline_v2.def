@@ -8,7 +8,7 @@ Stage: build
     default_params_WIDE.json
     default_params_LOWMEM.json
     default_params_NODROPOUT.json
-    casa-pipeline-release-5.6.2-2.el7.tar.gz
+    #casa-pipeline-release-5.6.2-2.el7.tar.gz
 
 %help
 	Manifest:
@@ -118,7 +118,7 @@ Stage: build
     
   # Install CASA
     cd /
-    #wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASAVER.tar.gz
+    wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASAVER.tar.gz
     tar -zxvf $CASAVER.tar.gz -C /container/bin
     rm $CASAVER.tar.gz
 
