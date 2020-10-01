@@ -7,38 +7,10 @@ From: ubuntu:18.04
 	default_params_WIDE.json
 	default_params_LOWMEM.json
 	default_params_NODROPOUT.json
+	casa-pipeline-release-5.6.2-2.el7.tar.gz
 
 %help
-	There are two main ways to interact with this container:
-
-	[1] > singularity shell eMERLIN_CASA_pipeline.img
-
-	This opens up an interactive shell within the container. You can use this mode to copy the inputs.ini and default_params.json file to the working directory in order to edit them for a custom pipeline run:
-
-	> cp /eMERLIN_CASA_pipeline/inputs.ini .
-	> cp /eMERLIN_CASA_pipeline/default_params.json .
-
-	The pipeline can then be called from within this interactive shell using the standard syntax, e.g.
-
-	> casa -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -r all
-
-	See instructions on Javier Moldon's GitHub page for more details:
-
-	**************************************************
-	https://github.com/e-merlin/eMERLIN_CASA_pipeline
-	**************************************************
-
-
-	[2] > singularity run eMERLIN_CASA_pipeline.img
-
-	This begins a completely automated, headless pipeline run using either (a) the inputs.ini and default_params.json files located in the current directory, provided these exist, or (b) the default inputs.ini and default_params.json files that come with the pipeline.
-
-	This is the preferred mode of interacting with the pipeline if you wish to use machines without X11 installed (i.e. SLURM-managed HPC nodes), and requires you to provide an appropriate inputs.ini file at the time of execution.
-
-	In this mode, the eMERLIN_CASA_pipeline.img should be located in the same directory as inputs.ini and in the same directory as the eMERLIN FITS-IDI file you wish to process. The inputs.ini file should have "fits_path" set to "./".
-
-	After the run, a tar file called "pipelined.tar.gz" is created, containing the results of the pipeline run and all associated weblog files.
-
+	Update help intructions...
 
 %runscript
 	. /conda/etc/profile.d/conda.sh
@@ -46,7 +18,6 @@ From: ubuntu:18.04
 	xvfb-run --auto-servernum bash /run_emerlin_pipeline.bash
 
 %startscript
-	echo "This is what happens when you start the container...
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
 	echo "You have started the container!"
@@ -61,10 +32,11 @@ From: ubuntu:18.04
         apt-add-repository multiverse
         apt-add-repository restricted
         apt-get update
+	#parseltongue
 	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
         DEBIAN_FRONTEND=noninteractive apt-get install libgtk3* htop glances git apt-utils vim -y
         DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -y
-        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger carta chgcentre ddfacet factor libidg miriad obit parseltongue pybdsf tirific python-pyfftw python3-pyfftw python-pyfftw-doc python3-pip xvfb -y
+        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger carta chgcentre ddfacet libidg pybdsf tirific python-pyfftw python3-pyfftw python-pyfftw-doc python3-pip xvfb factor miriad obit -y
 	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget git-lfs bash -y
         apt-get install -y build-essential cmake gfortran g++ gcc libncurses5-dev libreadline-dev flex bison libblas-dev liblapacke-dev wcslib-dev libcfitsio-dev emacs nano
         apt-get install -y libhdf5-dev libfftw3-dev python-numpy-dev libboost-python-dev libpython3.6-dev libqt4-dev libpthread-stubs0-dev fort77 pthread* rsync
@@ -82,9 +54,13 @@ From: ubuntu:18.04
 	conda create -n astroconda stsci
 	conda install -c conda-forge galsim astromatic-swarp astromatic-source-extractor astromatic-stiff -n astroconda
 	conda install -c pkgw-forge ds9
+
+	#Install Bob Watson's self-calibration package and dependencies
+	git clone https://github.com/DrWhatson/SelfCal.git
+	pip3 install pyyaml
 	
 	#Prepare and install CASA
-	wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASASTRING.tar.gz
+	#wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASASTRING.tar.gz
 	tar -zxvf $CASASTRING.tar.gz
 
 	#Install eMERLIN CASA pipeline, but disable auto-update of "data" directory
