@@ -1,8 +1,8 @@
-##README
+## README
 
 This repository contains some useful(?) build scripts for Singularity containers used in the processing of (mostly radio) astronomical data. 
 
-##Container images
+## Container images
 1. ___kerndef.def___ Contains some of the radio astronomy software packages I use most frequently from Gijs Molenaar's KERN Suite (https://kernsuite.info/).
 2. ___emerlin\_pipeline.def___ Contains many of the KERN packages, but additionally includes a full install of CASA (https://casa.nrao.edu/ -- currently v5.6.2-2) along with Javier Moldon's eMERLIN CASA pipeline (https://github.com/e-merlin/eMERLIN_CASA_pipeline). Please see the README on Javier's github page for detailed instructions on how to use the pipeline. 
 3. ___jvla\_pipeline.def___ Another variant of the KERN + CASA image, with an additional Python control script to enable automated processing of VLA data using the NRAO VLA CASA pipeline (https://science.nrao.edu/facilities/vla/data-processing/pipeline).
@@ -19,8 +19,8 @@ with ___emerlin\_pipeline.def___ automatically scripting and initialising an eME
 
 > singularity run-help [imagename]
 
-##Quick start
-####eMERLIN data processing quick start
+## Quick start
+#### eMERLIN data processing quick start
 
 If you are in possession of raw eMERLIN FITS-IDI files and wish to process them, then the simplest way to do this using the Singularity container image is:
 
@@ -53,7 +53,7 @@ If you are in possession of raw eMERLIN FITS-IDI files and wish to process them,
 	
 And then edit the default\_params.json file using your favourite text editor. Run the pipeline as normal (Step 4). The default\_params.json you just edited will be used in preference to the standard version bundled with the pipeline.
 
-####JVLA data processing quick start
+#### JVLA data processing quick start
 
 Compared with the eMERLIN CASA pipeline, there are relatively few "knobs and dials" that can be tweeked with the JVLA CASA pipeline. To pipeline JVLA data using this container image, I recommend that when downloading your data from the NRAO archive you select SDM-BDF data format and check "create SDM or MS tar file". Then wait for the email from NRAO indicating your data are available for download, download the tar file (e.g. using wget) and then place the data inside a directory with your JVLA CASA pipeline Singularity container image. Then do
 
@@ -61,7 +61,7 @@ Compared with the eMERLIN CASA pipeline, there are relatively few "knobs and dia
 
 And wait (typically 18-24 hours) for the pipeline to run on your data. When run in this manner, the container executes a little Python script which untars the SDM-BDF tar file and then initialises and runs the JVLA CASA pipeline on the dataset you downloaded. You do not need to start CASA yourself, or tell it which dataset to operate on - any *.tar file (and there should be only one...) located in the current working directory will be assumed to be a VLA observation, and will be untarred and fed to the CASA pipeline automatically.
 
-##Behavior on headless/X11-less systems
+## Behavior on headless/X11-less systems
 
 Neither the eMERLIN nor VLA CASA pipelines require human interaction once running, and indeed both can be run without creating pop-up windows by calling
 > casa --nologger --log2term
