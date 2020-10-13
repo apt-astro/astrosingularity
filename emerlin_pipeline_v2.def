@@ -8,7 +8,8 @@ Stage: build
     default_params_WIDE.json
     default_params_LOWMEM.json
     default_params_NODROPOUT.json
-    #casa-pipeline-release-5.6.2-2.el7.tar.gz
+    casa-pipeline-release-5.6.2-2.el7.tar.gz
+    ./aoflagger_strategies/default/*.lua
 
 %help
 	Manifest:
@@ -24,9 +25,9 @@ Stage: build
 	echo "There is no default run action associated with this build."
 
 %startscript
+	echo "Welcome to The Matrix"
 	. /conda/etc/profile.d/conda.sh
 	conda activate astroconda
-	echo "Conda has been activated."
 
 %environment
   # Set system locale
@@ -35,15 +36,27 @@ Stage: build
     export IDGAPI_DIR=/usr/local/idg
     export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib/x86_64-linux-gnu/hdf5/serial:/usr/local/idg/lib"
     export PATH="$PATH:/container/bin/$CASAVER/bin"
-    export PATH="$PATH:/conda/bin"
+    export PATH="/conda/bin:$PATH"
     export PYTHONPATH="/conda/bin:$PYTHONPATH"
     export LD_LIBRARY_PATH="$CASAROOT/$CASA_ARCH/lib:$LD_LIBRARY_PATH"
     export CASA_ENABLE_TELEMETRY=false
+    echo "Welcome to The Matrix"
+    . /conda/etc/profile.d/conda.sh
+    conda activate astroconda
 
 %post
   # Set software versions here
     export WSCLEANVER="v2.10.1"
+    export AOFLAGGERVER="v2.10.0"
     export CASAVER=casa-pipeline-release-5.6.2-2.el7
+
+  # Create a directory for scripts
+    mkdir /scripts
+    mv dowsclean_target.py /scripts
+    mv dowsclean_calibrators.py /scripts
+    mv default_params_WIDE.json /scripts
+    mv default_params_LOWMEM.json /scripts
+    mv default_params_NODROPOUT.json /scripts
 
   # Create a /container/bin directory
     mkdir -p /container/bin
@@ -61,9 +74,9 @@ Stage: build
     apt-get dist-upgrade -y
 
     apt install -y wget gcc libxml2 libxml2-dev curl gpg-agent build-essential
-    apt-get install -y wget apt-utils apt-transport-https git vim rsync
+    apt-get install -y wget apt-utils apt-transport-https git vim rsync lsb-*
 
-    apt-get install -y python3-dev libyaml-dev python3-yaml python3-pip
+    apt-get install -y python3-dev libyaml-dev python3-yaml python3-pip python3 python3-numpy
     apt-get install -y casacore-dev libgsl-dev libhdf5-dev libfftw3-dev
     apt-get install -y casacore-data
     apt-get install -y libboost-dev libboost-date-time-dev libboost-test-dev
@@ -75,13 +88,8 @@ Stage: build
     apt-get install -y lua5.4-dev libsm6 libxft2 libxi-dev
     apt-get install -y htop glances nano emacs bash dstat* pthread* xvfb
 
-  # Grab and compile aoflagger
-    cd /
-    git clone https://gitlab.com/aroffringa/aoflagger.git
-    cd aoflagger && mkdir build && cd build
-    cmake -DPORTABLE=Yes ..
-    make 
-    make install
+    #Additional apt-get for rfigui
+    apt-get install -y libgtkmm-3.0-dev liblua5.3-dev libpython3-dev libxml2-dev pkg-config
 
   # Add the cuda stuff
     apt-get install -y nvidia-detect
@@ -109,6 +117,15 @@ Stage: build
   # Install MPI version too
     cp wsclean-mp /usr/local/bin/.
 
+
+  # Grab and compile aoflagger
+    cd /
+    git clone https://gitlab.com/aroffringa/aoflagger.git
+    cd aoflagger && mkdir build && cd build
+    cmake -DPORTABLE=Yes ..
+    make 
+    make install
+
   # Make and install chgcentre
     cd /wsclean/chgcentre
     mkdir -p build
@@ -118,7 +135,7 @@ Stage: build
     
   # Install CASA
     cd /
-    wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASAVER.tar.gz
+    #wget https://casa.nrao.edu/download/distro/casa-pipeline/release/el7/$CASAVER.tar.gz
     tar -zxvf $CASAVER.tar.gz -C /container/bin
     rm $CASAVER.tar.gz
 
@@ -146,7 +163,12 @@ Stage: build
     sed -i -e "s/loc = '\/home\/emerlin\/jmoldon\/otcx\/antenna_monitor.log'/loc = '.\/antenna_monitor.log'/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
     sed -i -e "s/logfile = '\/pipeline1\/emerlin\/files\/antenna_monitor.log'/logfile = '.\/antenna_monitor.log'/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
 
-  #Add Conda later...
+    #Update aoflagger strategies
+    mv /aoflagger_strategies/default/*.lua /eMERLIN_CASA_pipeline/aoflagger_strategies/default/
+    sed -i -e "s/rfis/lua/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
+    rm -r /aoflagger_strategies
+
+    #Add Conda later...
     export SINGULARITY_SHELL=/bin/bash
     wget https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O conda.sh
     bash conda.sh -b -p conda
@@ -156,7 +178,8 @@ Stage: build
     conda config --add channels http://ssb.stsci.edu/astroconda
     conda create -n astroconda stsci
     conda install -c conda-forge galsim astromatic-swarp astromatic-source-extractor astromatic-stiff -n astroconda
-    conda install -c pkgw-forge ds9 pyyaml
+    conda install -c pkgw-forge ds9 pyyaml -n astroconda
+    conda install -c pkgw-forge ds9 pyyaml -n base
     rm /conda.sh	
 
     #Install Bob Watson's self-calibration package and dependencies
