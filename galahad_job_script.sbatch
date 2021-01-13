@@ -2,6 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --exclusive
 #SBATCH --time=120:00:00
+#SBATCH --constraint=rack-0,12CPUs|rack-0,24CPUs
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=MYEMAIL
 #^^^Please enter your own email address here instead of "MYEMAIL" if you wish to be notified when the pipeline run ends,
