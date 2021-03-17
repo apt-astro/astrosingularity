@@ -1,4 +1,11 @@
-export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_pipeline_011020.img
+export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_160221.img
+
+if [ "$MAKEWIDEFIELD" == "True" ]; then
+    echo "You have asked me to make wide field images of the target field(s)."
+    if [ "$IMAGECALIBRATORS" == "True" ]; then
+	echo "You have also asked me to make wide-field images of the calibrator fields."
+    fi
+fi
 
 #Set up directory structure on compute node
 echo "I will try to clear up any files that belong to you before we begin. You will likely see a 'permission denied' error as I try to look inside the /lost+found/ directory:"
@@ -26,7 +33,8 @@ if [ -f "$HOME/.login" ]; then
     source $HOME/.login
 fi
 
-echo "The compute machine is: " && cat /proc/sys/kernel/hostname
+HOST=$(cat /proc/sys/kernel/hostname)
+echo "The compute machine is $HOST"
 echo ""
 echo "Current activity:"
 uptime
@@ -46,8 +54,8 @@ df -h
 
 #Check what size the input data directory is and decide where to process
 echo "The input directory (DATAIN) is: $DATAIN"
-CHECK=$(du -cb $DATAIN/*.fits | grep total | cut -f1)
-export THRESH=270000000000
+CHECK=$(du -cb $DATAIN*.fits | grep total | cut -f1)
+export THRESH=205000000000
 echo "The dataset is $((CHECK / 1000000000))GB"
 echo "Threshold size: $((THRESH / 1000000000))GB"
 
@@ -62,9 +70,16 @@ if [ "$CHECK" -lt "$THRESH" ]; then
     fi
     mkdir -p $WORKINGDIR
 else
-    echo "This is a large dataset. I will process it on the NAS drive"
-    export WORKINGDIR=/share/nas/$user/pipe_tmp/$PROJECT
-    export PARENT=/share/nas/$user/pipe_tmp
+    echo "This is a large dataset."
+    if [ $HOST != "compute-0-100" ] && [ $HOST != "compute-0-101" ] && [ $HOST != "compute-0-102" ]; then
+	echo "We are working on a low memory node. I will process this dataset on the NAS drive"
+	export WORKINGDIR=/share/nas/$user/pipe_tmp/$PROJECT
+	export PARENT=/share/nas/$user/pipe_tmp
+    else
+	echo "I have been assigned a high-memory node. I will do the processing on an internal volume."
+	export WORKINGDIR=/state/partition1/$user/$PROJECT
+	export PARENT=/state/partition1/$user
+    fi
     echo "WORKINGDIR: $WORKINGDIR"
     if [ -d $WORKINGDIR ]; then
 	echo "$WORKINGDIR exists. Clearing contents..."
@@ -81,7 +96,16 @@ fi
 echo "The output directory is $DATAOUT"
 
 #Bind the input data directory to the container
-export SINGULARITY_BIND=$WORKINGDIR:/workingdir,/state/partition2,$DATAIN:/raw_data
+if [ "$USECALIBRATORMODEL" == "True" ]; then
+    echo "Using custom calibrator model directory"
+    export MODELDIR=$(cd $DATAIN; cd ../; pwd)\/calibrator_models
+    export SINGULARITY_BIND=$WORKINGDIR:/workingdir,/state/partition2,$DATAIN:/raw_data,$MODELDIR:/calibrator_models
+else
+    echo "Using default calibrator models (1331+305 and 3C286 C-band only)"
+    export SINGULARITY_BIND=$WORKINGDIR:/workingdir,/state/partition2,$DATAIN:/raw_data
+fi
+
+echo "The following directories are bound to the container: $SINGULARITY_BIND"
 
 #echo "Files now on local hard drives after cleaning: "
 #ls -ltrkh /state/partition1
@@ -150,6 +174,12 @@ else
     export INPUTFILE=/raw_data/inputs.ini
 fi
 
+#Check to see if there are custom flag strategies present, and if so copy them
+if [ -d $DATAIN/aoflagger_strategies ]; then
+    echo "Found some custom flag strategies. Copying these to the processing directory."
+    cp -r $DATAIN/aoflagger_strategies $WORKINGDIR
+fi
+
 #Do utime to show what resources are available
 #echo ""
 #echo "Here's the output of ulimit -a to  show what resources are available at the start of the run. Has it changed from before?"
@@ -159,8 +189,8 @@ fi
 
 #Run the pipeline (this step also copies the latest observatory flags from a NAS drive which is updated hourly from Javier's master)
 echo "This is the command that is being executed (uncludes ulimit -a inside the container): "
-echo singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
-singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
+echo singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && wget http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/rfi_mask.flags && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
+singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && wget http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/rfi_mask.flags && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
 
 if [ "$MAKEWIDEFIELD" == "True" ]; then
     #echo "Using Python from:"
@@ -180,6 +210,8 @@ if [ "$MAKEWIDEFIELD" == "True" ]; then
     mv $WORKINGDIR/*.bash $WORKINGDIR/widefield_images
     #singularity exec $PIPELINEVER rm /workingdir/wsclean_commands.bash
     singularity exec $PIPELINEVER rm /workingdir/dowsclean_target.py
+else
+    echo "User did not request wide-field imaging: skipping for now..."
 fi
 
 #Kill any stray XVfb processes
@@ -236,17 +268,18 @@ bash -c "tar -C $PARENT -cvf $DATAIN/$PROJECT.tar $PROJECT"
 echo ""
 echo "Now moving data back to NAS:"
 date
-echo mv $WORKINGDIR $DATAOUT
-mv $WORKINGDIR $DATAOUT
 if [ -d "$WORKINGDIR/widefield\_images" ]; then
-    mv $WORKINGDIR/widefield\_images $DATAOUT
+    #mv $WORKINGDIR/widefield\_images $DATAOUT
+    rm -r $WORKINGDIR/widefield\_images
 fi
 #mv /state/partition2/$PROJECT $DATAOUT
+echo mv $WORKINGDIR $DATAOUT
+mv $WORKINGDIR $DATAOUT
 
 #Copy SLURM output file
 echo "Copying SLURM output file:"
 echo "$(cd $DATAIN; cd ../../; pwd)"/slurm-$SLURM_JOB_ID.out $DATAOUT
-cp "$(cd $DATAIN; cd ../../; pwd)"/slurm-$SLURM_JOB_ID.out $DATAOUT
+mv "$(cd $DATAIN; cd ../../; pwd)"/slurm-$SLURM_JOB_ID.out $DATAOUT/$PROJECT
 
 #Change permissions on the processed data
 #echo chmod 777 $DATAOUT/$WORKINGDIR.tar

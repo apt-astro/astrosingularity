@@ -159,12 +159,8 @@ Stage: build
   #Install eMERLIN CASA pipeline, but disable auto-update of "data" directory
   #to respect the fact that this container is a read-only FS
     cd /
-    git clone https://github.com/e-merlin/eMERLIN_CASA_pipeline.git
+    git clone https://github.com/apt-astro/eMERLIN_CASA_pipeline.git
     sed -i -e 's/"update_casa-data"       : true,/"update_casa-data"       : false,/g' /eMERLIN_CASA_pipeline/default_params.json
-    sed -i -e "s/if t0 > datetime.datetime(2019,1,25,17,15,0) and s == 'pipeline':/if t0 > datetime.datetime(2019,1,25,17,15,0):/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
-    sed -i -e "s/os.system('scp -pr {0}.{1}:{2} \/pipeline1\/emerlin\/files\/'.format(s1,s2,loc))/pass/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
-    sed -i -e "s/loc = '\/home\/emerlin\/jmoldon\/otcx\/antenna_monitor.log'/loc = '.\/antenna_monitor.log'/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
-    sed -i -e "s/logfile = '\/pipeline1\/emerlin\/files\/antenna_monitor.log'/logfile = '.\/antenna_monitor.log'/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
 
     #Update aoflagger strategies
     mv ./aoflagger_strategies/default/*.lua /eMERLIN_CASA_pipeline/aoflagger_strategies/default/
