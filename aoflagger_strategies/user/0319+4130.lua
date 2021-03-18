@@ -1,7 +1,12 @@
 --[[
- eMERLIN-specific AOFlagger strategy, version 13-10-2020
- Authors: Alasdair Thomson & Javier Moldon
+ This is the default AOFlagger strategy, version 2020-05-26
+ Author: André Offringa
+
+ This strategy is made as generic / easy to tweak as possible, with the most important
+'tweaking' parameters available as variables at the beginning of function 'execute'.
 ]]--
+
+aoflagger.require_min_version("3.0")
 
 function execute(input)
 
@@ -15,14 +20,17 @@ function execute(input)
   -- { 'I', 'Q' } to flag only on Stokes I and Q
   local flag_polarizations = input:get_polarizations()
 
-  local base_threshold = 0.8  -- lower means more sensitive detection
+  local base_threshold = 1.7  -- lower means more sensitive detection
   -- How to flag complex values, options are: phase, amplitude, real, imaginary, complex
   -- May have multiple values to perform detection multiple times
   local flag_representations = { "amplitude" }
-  local iteration_count = 5  -- how many iterations to perform?
+  local iteration_count = 10  -- how many iterations to perform?
   local threshold_factor_step = 2.0 -- How much to increase the sensitivity each iteration?
-  local exclude_original_flags = false
-  local frequency_resize_factor = 1.0 -- Amount of "extra" smoothing in frequency direction
+  -- If the following variable is true, the strategy will consider existing flags
+  -- as bad data. It will exclude flagged data from detection, and make sure that any existing
+  -- flags on input will be flagged on output. If set to false, existing flags are ignored.
+  local exclude_original_flags = true
+  local frequency_resize_factor = 3.0 -- Amount of "extra" smoothing in frequency direction
   local transient_threshold_factor = 1.0 -- decreasing this value makes detection of transient RFI more aggressive
  
   --
@@ -59,7 +67,7 @@ function execute(input)
 
         -- Do timestep & channel flagging
         local chdata = data:copy()
-        aoflagger.threshold_timestep_rms(data, 3.0)
+        aoflagger.threshold_timestep_rms(data, 3.5)
         aoflagger.threshold_channel_rms(chdata, 3.0 * threshold_factor, true)
         data:join_mask(chdata)
 
@@ -70,7 +78,7 @@ function execute(input)
         end
 
         local resized_data = aoflagger.downsample(data, 3, frequency_resize_factor, true)
-        aoflagger.low_pass_filter(resized_data, 21, 31, 1.6, 2.2)
+        aoflagger.low_pass_filter(resized_data, 21, 31, 2.5, 5.0)
         aoflagger.upsample(resized_data, data, 3, frequency_resize_factor)
 
         -- In case this script is run from inside rfigui, calling
@@ -129,5 +137,6 @@ function execute(input)
     -- visualized with aoqplot.
     aoflagger.collect_statistics(input, copy_of_input)
   end
+  input:flag_nans()
 end
 
