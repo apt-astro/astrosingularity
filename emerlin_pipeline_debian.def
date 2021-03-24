@@ -8,11 +8,8 @@ Stage: build
     default_params_WIDE.json
     default_params_LOWMEM.json
     default_params_NODROPOUT.json
-    casa-pipeline-release-5.6.2-2.el7.tar.gz
-    ./aoflagger_strategies/default/0319+415.lua
-    ./aoflagger_strategies/default/1331+305.lua
-    ./aoflagger_strategies/default/1407+284.lua
-    ./aoflagger_strategies/default/default_faint.lua
+    casa-pipeline-release-5.6.2-3.el7.tar.gz
+    ./aoflagger_strategies/
 
 %help
 	Manifest:
@@ -77,7 +74,7 @@ Stage: build
     apt-get dist-upgrade -y
 
     apt install -y wget gcc libxml2 libxml2-dev curl gpg-agent build-essential
-    apt-get install -y wget apt-utils apt-transport-https git vim rsync lsb-*
+    apt-get install -y wget apt-utils apt-transport-https git vim rsync lsb-* time
 
     apt-get install -y python3-dev libyaml-dev python3-yaml python3-pip python3 python3-numpy
     apt-get install -y casacore-dev libgsl-dev libhdf5-dev libfftw3-dev
@@ -163,9 +160,9 @@ Stage: build
     sed -i -e 's/"update_casa-data"       : true,/"update_casa-data"       : false,/g' /eMERLIN_CASA_pipeline/default_params.json
 
     #Update aoflagger strategies
-    mv ./aoflagger_strategies/default/*.lua /eMERLIN_CASA_pipeline/aoflagger_strategies/default/
-    sed -i -e "s/rfis/lua/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
-    rm -r /aoflagger_strategies
+    rm -r /eMERLIN_CASA_pipeline/aoflagger_strategies
+    mv /aoflagger_strategies/* /eMERLIN_CASA_pipeline/
+    rmdir /aoflagger_strategies  
 
     #Add Conda later...
     export SINGULARITY_SHELL=/bin/bash
