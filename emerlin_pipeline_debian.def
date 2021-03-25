@@ -13,7 +13,7 @@ Stage: build
 
 %help
 	Manifest:
-		- CASA v5.6.2-2: https://casa.nrao.edu/casa_obtaining.shtml
+		- CASA v5.6.2-3: https://casa.nrao.edu/casa_obtaining.shtml
 		- WSCLEAN v2.10.1: https://gitlab.com/aroffringa/wsclean.git
 		- AOFLAGGER (latest stable build): https://gitlab.com/aroffringa/aoflagger.git
 		- IDG (latest stable build)
@@ -31,7 +31,7 @@ Stage: build
 
 %environment
   # Set system locale
-    export CASAVER=casa-pipeline-release-5.6.2-2.el7
+    export CASAVER=casa-pipeline-release-5.6.2-3.el7
     export LC_ALL=C
     export IDGAPI_DIR=/usr/local/idg
     export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib/x86_64-linux-gnu/hdf5/serial:/usr/local/idg/lib"
@@ -48,7 +48,7 @@ Stage: build
   # Set software versions here
     export WSCLEANVER="v2.10.1"
     export AOFLAGGERVER="v2.10.0"
-    export CASAVER=casa-pipeline-release-5.6.2-2.el7
+    export CASAVER=casa-pipeline-release-5.6.2-3.el7
 
   # Create a directory for scripts
     mkdir /scripts
@@ -86,7 +86,7 @@ Stage: build
     apt-get install -y libopenmpi-dev doxygen
     apt-get install -y libpng-dev pybind11-dev
     apt-get install -y lua5.4-dev libsm6 libxft2 libxi-dev
-    apt-get install -y htop glances nano emacs bash dstat* pthread* xvfb
+    apt-get install -y htop glances nano emacs bash dstat* pthread* xvfb ncdu
 
     #Additional apt-get for rfigui
     apt-get install -y libgtkmm-3.0-dev liblua5.3-dev libpython3-dev libxml2-dev pkg-config
