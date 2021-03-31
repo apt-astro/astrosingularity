@@ -24,7 +24,7 @@ function execute(input)
   -- How to flag complex values, options are: phase, amplitude, real, imaginary, complex
   -- May have multiple values to perform detection multiple times
   local flag_representations = { "amplitude" }
-  local iteration_count = 10  -- how many iterations to perform?
+  local iteration_count = 13  -- how many iterations to perform?
   local threshold_factor_step = 2.0 -- How much to increase the sensitivity each iteration?
   -- If the following variable is true, the strategy will consider existing flags
   -- as bad data. It will exclude flagged data from detection, and make sure that any existing
@@ -49,11 +49,12 @@ function execute(input)
   for ipol,polarization in ipairs(flag_polarizations) do
  
     local pol_data = input:convert_to_polarization(polarization)
+    local original_data
 
     for _,representation in ipairs(flag_representations) do
 
       data = pol_data:convert_to_complex(representation)
-      local original_data = data:copy()
+      original_data = data:copy()
 
       for i=1,iteration_count-1 do
         local threshold_factor = math.pow(threshold_factor_step, iteration_count-i)
@@ -102,7 +103,11 @@ function execute(input)
       end
     end -- end of complex representation iteration
 
-    -- Helper function used in the strategy
+    if(exclude_original_flags) then
+      data:join_mask(original_data)
+    end
+
+    -- Helper function used below
     function contains(arr, val)
       for _,v in ipairs(arr) do
         if v == val then return true end
