@@ -47,7 +47,6 @@ Stage: build
 %post
   # Set software versions here
     export WSCLEANVER="v2.10.1"
-    export AOFLAGGERVER="v2.10.0"
     export CASAVER=casa-pipeline-release-5.6.2-3.el7
 
   # Create a directory for scripts
