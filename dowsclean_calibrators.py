@@ -78,7 +78,7 @@ if nucentre >= 19000 and nucentre <= 25000:
     scale = '0.005'
 
 print('Now attempting to execute "wsclean_calibrator.bash":')
-f = open("wsclean_commands.bash", "w")
+f = open("wsclean_calibrator.bash", "w")
 f.write("#WSCLEAN commands for calibrator fields:\n")
 for i in range(0,len(fieldids)):
     if fieldcode[i] != 'TARGET':
