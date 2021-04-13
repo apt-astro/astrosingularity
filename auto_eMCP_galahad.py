@@ -12,18 +12,6 @@ def write_prepare_scripts(run):
     project_dir = global_path+project
     output_dir = project_dir +'/'+ subproject
     prepare_script = 's1_prepare_'+subproject+'.sh'
-    #f = open(prepare_script, 'wb')
-    #f.write('mkdir {0}\n'.format(project_dir))
-    #f.write('mkdir {0}\n'.format(output_dir))
-    #f.write('cd {0}\n'.format(output_dir))
-    #f.write('rm -rf ./eMERLIN_CASA_pipeline/\n')
-    #f.write('git clone https://github.com/e-merlin/CASA_eMERLIN_pipeline.git\n')
-    #f.write('cp -pr {0} .\n'.format(pipeline_path))
-    #f.write('cp -pr {0}/inputs.ini .\n'.format(pipeline_path))
-    #f.write('cp -pr {0}/default_params.json .\n'.format(pipeline_path))
-    data_path = fits_path+project+'/'+subproject+'/DATA/'
-    #f.write("sed -i \'s/project_name/{0}/g\' {1}\n".format(subproject, 'inputs.ini'))
-    #f.write("sed -i \'s/\/path\/to\/fits\/files\//{0}/g\' {1}\n".format(data_path.replace('/','\/'), 'inputs.ini'))
     source_tag = ['target_name','phscal_name','fluxcal_name','bpcal_name','ptcal_name']
     for s in source_tag:
         name = run[s]
@@ -65,14 +53,15 @@ def write_export_script(run):
     subproject = run['subproject']
     data_location = np.atleast_1d(run['data_location'])
     project_dir = global_path + project
-    #f.write('mkdir {0}/{1}\n'.format(fits_path, project))
-    #f.write('mkdir {0}/{1}/{2}\n'.format(fits_path, project, subproject))
     f.write('mkdir -p {0}/{1}/{2}/DATA\n'.format(fits_path, project, subproject))
     output_dir = '{0}/{1}/{2}/DATA/'.format(fits_path, project, subproject)
+    datasize = 0.0
     for i in range(len(data_location)):
         time_sel = select_date(run, i)
         outfile = output_dir+subproject+'_{0:02d}.fits'.format(i)
         data = '/home/emerlin/observations/sub_array_jobs/'+data_location[i]
+        dataabspath = os.path.realpath(data+".data") 
+        datasize += os.path.getsize(dataabspath)/(1024**3)
         f.write('data_tool -m x-fits {0} -w {1} -f {2}\n'.format(time_sel, outfile, data))
     if 'additional' in run.keys():
         for i,s in enumerate(run['additional'].keys()):
@@ -80,7 +69,6 @@ def write_export_script(run):
             add_command = write_additional_export(run, s, outfile)
             f.write(add_command+'\n')
     f.write('cp -pr {0}/inputs.ini {1}\n'.format(pipeline_path, output_dir))
-    #f.write('cp -pr {0}/default_params.json {1}\n'.format(pipeline_path, output_dir))
     data_path = fits_path+project+'/'+subproject+'/DATA/'
     f.write("sed -i \'s/project_name/{0}/g\' {1}\n".format(subproject, output_dir+'inputs.ini'))
     f.write("sed -i \'s/\/path\/to\/fits\/files\//{0}/g\' {1}\n".format('\/raw_data\/', output_dir+'inputs.ini'))
@@ -90,14 +78,20 @@ def write_export_script(run):
         f.write("sed -i \'s/{0}/{1}/g\' {2}\n".format(s, name, output_dir+'inputs.ini'))
     
     f.write('touch {0}/export_finished\n'.format(output_dir))
+
     #Set up SLURM script for Galahad
     f.write('wget https://raw.githubusercontent.com/apt-astro/astrosingularity/master/galahad_job_script.sbatch -O '+fits_path+project+'/'+subproject+'.sbatch\n')
     f.write("sed -i -e 's/MYEMAIL/"+emailaddr+"/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/USERID/emadmin/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/PROJID/"+subproject+"/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("sed -i -e 's/DATADIR/{0}/g' {1}.sbatch\n".format(str('/share/nas/emadmin/'+project+'/'+subproject+'/DATA/').replace('/','\/'), fits_path+project+'/'+subproject))
+    f.write("#Absolute size of exported data in GB: {0}\n".format(datasize))
+    if datasize >= 400:
+        #If this is a large dataset, process it on a high-mem node
+        f.write("sed -i -e 's/rack-0,12CPUs|rack-0,24CPUs/rack-0,8CPUs|rack-0,16CPUs/g' "+fits_path+project+'/'+subproject+".sbatch\n")
     f.write("chmod -R 777 "+fits_path+project+"/")
     f.close()
+
     #Create script for moving data to NAS drive
     if project[0] == 'C' and project[1] == 'Y':
         if project[2] in '123456789' and len(project) == 6:
@@ -140,10 +134,6 @@ def write_run_pipeline(run):
     project_dir = global_path+project
     output_dir = project_dir +'/'+ subproject
     pipeline_script = 's3_execute_'+subproject+'.sh'
-    #pipeline_path = pipeline_path
-    #f = open(pipeline_script, 'wb')
-    #f.write('cd {0}\n'.format(output_dir))
-    #f.write('time {0} --nogui -c ./eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py --run-steps all\n'.format(casa_command))
     return 
 
 
