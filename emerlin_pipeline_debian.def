@@ -171,7 +171,7 @@ Stage: build
     conda update -y -n root conda
     conda update --all
     conda config --add channels http://ssb.stsci.edu/astroconda
-    conda create -n astroconda stsci
+    conda create -n astroconda python=3.6 stsci
     conda install -c conda-forge galsim astromatic-swarp astromatic-source-extractor astromatic-stiff -n astroconda
     conda install -c pkgw-forge ds9 pyyaml -n astroconda
     conda install -c pkgw-forge ds9 pyyaml -n base
