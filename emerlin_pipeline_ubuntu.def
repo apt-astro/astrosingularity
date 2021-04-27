@@ -78,10 +78,6 @@ From: ubuntu:18.04
 	sed -i -e "s/loc = '\/home\/emerlin\/jmoldon\/otcx\/antenna_monitor.log'/loc = '.\/antenna_monitor.log'/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
 	sed -i -e "s/logfile = '\/pipeline1\/emerlin\/files\/antenna_monitor.log'/logfile = '.\/antenna_monitor.log'/g" /eMERLIN_CASA_pipeline/functions/eMCP_functions.py
 
-
-
-
-
 	#Update UTC table for CASA
 	rsync -avz rsync://casa-rsync.nrao.edu/casa-data /$CASASTRING/data
 

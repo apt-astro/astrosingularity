@@ -1,0 +1,4 @@
+##########
+#4G+ signal
+##########
+mode='manual' spw='*:1.472GHz~1.492GHz'
