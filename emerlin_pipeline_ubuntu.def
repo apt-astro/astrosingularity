@@ -56,7 +56,7 @@ From: ubuntu:18.04
 	conda update -y -n root conda
 	conda update --all
 	conda config --add channels http://ssb.stsci.edu/astroconda
-	conda create -n python=3.6 astroconda stsci
+	conda create -n astroconda python=3.6 stsci
 	conda install -c conda-forge galsim astromatic-swarp astromatic-source-extractor astromatic-stiff -n astroconda
 	conda install -c pkgw-forge ds9
 
