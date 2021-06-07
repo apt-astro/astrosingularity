@@ -9,7 +9,7 @@ Stage: build
     default_params_LOWMEM.json
     default_params_NODROPOUT.json
     casa-pipeline-release-5.6.2-3.el7.tar.gz
-    ./aoflagger_strategies/
+    #./aoflagger_strategies/
 
 %help
 	Manifest:
@@ -159,9 +159,9 @@ Stage: build
     sed -i -e 's/"update_casa-data"       : true,/"update_casa-data"       : false,/g' /eMERLIN_CASA_pipeline/default_params.json
 
     #Update aoflagger strategies
-    rm -r /eMERLIN_CASA_pipeline/aoflagger_strategies
-    mv /aoflagger_strategies/* /eMERLIN_CASA_pipeline/
-    rmdir /aoflagger_strategies  
+    #rm -r /eMERLIN_CASA_pipeline/aoflagger_strategies
+    #mv /aoflagger_strategies/* /eMERLIN_CASA_pipeline/
+    #rmdir /aoflagger_strategies  
 
     #Add Conda later...
     export SINGULARITY_SHELL=/bin/bash
