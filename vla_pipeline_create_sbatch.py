@@ -6,7 +6,7 @@ import getpass
 #Change these variables as needed
 containerpath = "/share/nas/athomson/bin/eMERLIN_CASA_Pipeline_Ubuntu_100521.img"
 datapath = "/share/nas/athomson/NEP_VLA"
-emailaddr = "alasdair.thomson@manchester.ac.uk"
+emailaddr = "user.name@domain.org"
 
 #Hopefully nothing should need to be edited below this line?
 tarfiles = glob.glob('*.tar')
@@ -41,7 +41,7 @@ for tarfile in tarfiles:
         f.write("#SBATCH --begin=now+"+str(int(countlowmem*30))+"minutes\n")
         f.write("#SBATCH --constraint=rack-0,12CPUs|rack-0,24CPUs\n")
         countlowmem += 1
-    f.write("#SBATCH --mail-user="+emailadde+"\n\n")
+    f.write("#SBATCH --mail-user="+emailaddr+"\n\n")
     f.write("mkdir -p /state/partition1/"+user+"/"+str(tarfilestring)+"_pipeline\n")
     f.write("mkdir -p /state/partition2/"+user+"/"+str(tarfilestring)+"_pipeline\n")
     f.write("export SINGULARITY_BIND=/state/partition1/"+user+",/state/partition2/"+user+"/,/share/nas/"+user+"\n")
