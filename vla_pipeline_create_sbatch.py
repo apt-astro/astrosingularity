@@ -4,13 +4,13 @@ import glob
 import getpass
 
 #Change these variables as needed
-containerpath = "/share/nas/athomson/bin/eMERLIN_CASA_Pipeline_Ubuntu_100521.img"
-datapath = "/share/nas/athomson/NEP_VLA"
+containerpath = "/path/to/container/container.img"
+datapath = "/path/to/data"
 emailaddr = "user.name@domain.org"
+projID = "" #<-- Enter a VLA project code here
 
 #Hopefully nothing should need to be edited below this line?
 tarfiles = glob.glob('*.tar')
-#indir = os.getcwd()
 
 user = getpass.getuser()
 
@@ -45,7 +45,7 @@ for tarfile in tarfiles:
     f.write("mkdir -p /state/partition1/"+user+"/"+str(tarfilestring)+"_pipeline\n")
     f.write("mkdir -p /state/partition2/"+user+"/"+str(tarfilestring)+"_pipeline\n")
     f.write("export SINGULARITY_BIND=/state/partition1/"+user+",/state/partition2/"+user+"/,/share/nas/"+user+"\n")
-    f.write("tar -xvf "+str(tarfile)+" -C /state/partition1/"+user+"/"+str(tarfilestring)+"_pipeline\n")
+    f.write("tar -xvf "+str(tarfile)+" -C /state/partition2/"+user+"/"+str(tarfilestring)+"_pipeline\n")
     f.write("cd /state/partition2/"+user+"/"+str(tarfilestring)+"_pipeline\n")
     #f.write('wget https://raw.githubusercontent.com/apt-astro/astrosingularity/master/vla_pipeline_execute.py -O vla_pipeline_execute.py\n')
     f2 = open('vla_pipeline_execute.py', 'w')
