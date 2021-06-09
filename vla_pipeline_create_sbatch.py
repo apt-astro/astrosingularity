@@ -51,7 +51,7 @@ for tarfile in tarfiles:
     f2 = open('vla_pipeline_execute.py', 'w')
     f2.write('import glob\n')
     f2.write('import pipeline.recipes.hifv as hifv\n')
-    f2.write('datain = glob.glob('+projID+')\n')
+    f2.write('datain = glob.glob("'+projID+'")\n')
     f2.write('print("Input dataset is: "+str(datain))\n')
     f2.write('hifv.hifv(datain)\n')
     f2.close()
