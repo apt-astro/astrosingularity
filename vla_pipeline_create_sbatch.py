@@ -55,6 +55,7 @@ for tarfile in tarfiles:
     f2.write('print("Input dataset is: "+str(datain))\n')
     f2.write('hifv.hifv(datain)\n')
     f2.close()
+    f.write("cp "+datapath"/vla_pipeline_execute.py .\n")
     f.write("singularity exec "+containerpath+" xvfb-run -a casa --nogui --pipeline -c vla_pipeline_execute.py\n")
     f.write("mv /state/partition2/"+user+"/"+str(tarfilestring)+"_pipeline "+str(datapath)+"\n")
     f.write("rm -r /state/partition1/"+user+"\n")
