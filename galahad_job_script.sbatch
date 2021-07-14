@@ -29,6 +29,7 @@ export STEPS=all #Usual parameter to determine which pipeline steps to run, e.g.
 export MAKEWIDEFIELD=True #Image the target field out to the primary beam using wsclean
 export IMAGECALIBRATORS=False #Image the calibrator sources
 export USECALIBRATORMODEL=False #Use a model for the calibrators (alternative is to assume point source)
+#export CASAVER=5.8 #Leave this commented out if you wish to use CASA 5.6, or uncomment to use CASA 5.8
 
 #Execute the pipeline using these input parameters
 #(DO NOT EDIT BELOW THIS LINE)

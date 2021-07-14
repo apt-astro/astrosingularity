@@ -1,4 +1,15 @@
-export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_160221.img
+#Check if the user wants to use CASA 5.6 (default) or CASA 5.8
+#(experimental, but necessary if dealing with polarisation data
+#due to a fix in the labelling)
+if [ -n "$CASAVER" ]; then
+    if [ "$CASAVER" == "5.8" ]; then
+	export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_CASA_5.8_140721.img
+    else
+	export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_060721.img
+    fi
+else
+    export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_060721.img
+fi
 
 if [ "$MAKEWIDEFIELD" == "True" ]; then
     echo "You have asked me to make wide field images of the target field(s)."
@@ -99,10 +110,10 @@ echo "The output directory is $DATAOUT"
 if [ "$USECALIBRATORMODEL" == "True" ]; then
     echo "Using custom calibrator model directory"
     export MODELDIR=$(cd $DATAIN; cd ../; pwd)\/calibrator_models
-    export SINGULARITY_BIND=$WORKINGDIR:/workingdir,/state/partition2,$DATAIN:/raw_data,$MODELDIR:/calibrator_models
+    export SINGULARITY_BIND=$WORKINGDIR:/workingdir,/state/partition2,$DATAIN:/raw_data,$MODELDIR:/calibrator_models,/share/nas/emadmin/bin/analysis_scripts/
 else
     echo "Using default calibrator models (1331+305 and 3C286 C-band only)"
-    export SINGULARITY_BIND=$WORKINGDIR:/workingdir,/state/partition2,$DATAIN:/raw_data
+    export SINGULARITY_BIND=$WORKINGDIR:/workingdir,/state/partition2,$DATAIN:/raw_data,/share/nas/emadmin/bin/analysis_scripts/
 fi
 
 echo "The following directories are bound to the container: $SINGULARITY_BIND"
@@ -189,8 +200,8 @@ fi
 
 #Run the pipeline (this step also copies the latest observatory flags from a NAS drive which is updated hourly from Javier's master)
 echo "This is the command that is being executed (uncludes ulimit -a inside the container): "
-echo singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && wget http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/rfi_mask.flags && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
-singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && wget http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/rfi_mask.flags && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
+echo singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && wget -O rfi_mask.flags http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/rfi_mask.flags && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
+singularity exec $PIPELINEVER bash -c "ulimit -a && cd /workingdir && wget -O antenna_monitor.log http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/antenna_monitor.log && wget -O rfi_mask.flags http://www.e-merlin.ac.uk/distribute/antenna_log_rsync/rfi_mask.flags && xvfb-run -a casa --nogui -c /eMERLIN_CASA_pipeline/eMERLIN_CASA_pipeline.py -i $INPUTFILE -r $STEPS"
 
 if [ "$MAKEWIDEFIELD" == "True" ]; then
     #echo "Using Python from:"
