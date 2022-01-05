@@ -85,7 +85,7 @@ Stage: build
     apt-get install -y libopenmpi-dev doxygen
     apt-get install -y libpng-dev pybind11-dev
     apt-get install -y lua5.4-dev libsm6 libxft2 libxi-dev
-    apt-get install -y htop glances nano emacs bash dstat* pthread* xvfb ncdu
+    apt-get install -y htop nano emacs bash dstat* pthread* xvfb ncdu
 
     #Additional apt-get for rfigui
     apt-get install -y libgtkmm-3.0-dev liblua5.3-dev libpython3-dev libxml2-dev pkg-config

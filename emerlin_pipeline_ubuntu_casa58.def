@@ -40,7 +40,7 @@ From: ubuntu:18.04
 	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget git-lfs bash -y
         apt-get install -y build-essential cmake gfortran g++ gcc libncurses5-dev libreadline-dev flex bison libblas-dev liblapacke-dev wcslib-dev libcfitsio-dev emacs nano
         apt-get install -y libhdf5-dev libfftw3-dev python-numpy-dev libboost-python-dev libpython3.6-dev libqt4-dev libpthread-stubs0-dev fort77 pthread* rsync
-	apt-get install -y nvidia-smi lsof
+	apt-get install -y nvidia-utils-470 lsof
 	pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose psutil ipywidgets ipyparallel bokeh scikit-learn gpustat
 
 	#Install imagemagick and prerequisites (useful for VLA CASA pipeline)

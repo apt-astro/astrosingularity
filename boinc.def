@@ -12,7 +12,7 @@ From: ubuntu:18.04
         apt-add-repository restricted
       	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
         DEBIAN_FRONTEND=noninteractive apt-get install libgtk3* htop apt-utils nano glances lsof -y
-       	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget bash boinc boinc-manager boinc-client -y
+       	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget bash boinc boinc-manager boinc-client ffmpeg mkvtoolnix -y
     
 
 	

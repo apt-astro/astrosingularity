@@ -2,13 +2,20 @@
 #(experimental, but necessary if dealing with polarisation data
 #due to a fix in the labelling)
 if [ -n "$CASAVER" ]; then
-    if [ "$CASAVER" == "5.8" ]; then
-	export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_CASA_5.8_140721.img
+    if [ "$CASAVER" == "5.6" ]; then
+	export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_CASA56_2022-01-05.img
     else
-	export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_060721.img
+	export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_CASA58_2022-01-05.img
     fi
 else
-    export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_060721.img
+    export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Ubuntu_CASA58_2022-01-05.img
+fi
+
+#Let the user run the experimental DEBIAN-based container if they wish
+if [ -n "$OS" ]; then
+    if [ "$OS" == "DEBIAN" ]; then
+	export PIPELINEVER=/share/nas/emadmin/Pipeline/eMERLIN_CASA_Pipeline_Debian_2021-12-13.img
+    fi
 fi
 
 if [ "$MAKEWIDEFIELD" == "True" ]; then
@@ -82,7 +89,7 @@ if [ "$CHECK" -lt "$THRESH" ]; then
     mkdir -p $WORKINGDIR
 else
     echo "This is a large dataset."
-    if [ $HOST != "compute-0-100" ] && [ $HOST != "compute-0-101" ] && [ $HOST != "compute-0-102" ]; then
+    if [ $HOST != "compute-0-100" ] && [ $HOST != "compute-0-101" ] && [ $HOST != "compute-0-102" ] && [ $HOST != "compute-0-103" ] && [ $HOST != "compute-0-104" ] && [ $HOST != "compute-0-106" ] && [ $HOST != "compute-0-108" ] && [ $HOST != "compute-0-100.local" ] && [ $HOST != "compute-0-101.local" ] && [ $HOST != "compute-0-102.local" ] && [ $HOST != "compute-0-103.local" ] && [ $HOST != "compute-0-104.local" ] && [ $HOST != "compute-0-106.local" ] && [ $HOST != "compute-0-108.local" ]; then
 	echo "We are working on a low memory node. I will process this dataset on the NAS drive"
 	export WORKINGDIR=/share/nas/$user/pipe_tmp/$PROJECT
 	export PARENT=/share/nas/$user/pipe_tmp
