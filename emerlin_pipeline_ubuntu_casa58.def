@@ -1,8 +1,8 @@
 BootStrap: library
-From: ubuntu:18.04
+From: ubuntu:20.04
 
 %files
-	dowsclean_target.py
+	/home/alasdair/bin/astrosingularity/dowsclean_target.py /
 	dowsclean_calibrators.py
 	default_params_WIDE.json
 	default_params_LOWMEM.json
@@ -28,20 +28,20 @@ From: ubuntu:18.04
 	#Update and install KERN packages
 	apt-get update
         DEBIAN_FRONTEND=noninteractive apt-get install software-properties-common time -y
-        add-apt-repository -s ppa:kernsuite/kern-5
+        add-apt-repository -s ppa:kernsuite/kern-7
         apt-add-repository multiverse
         apt-add-repository restricted
         apt-get update
 	#parseltongue
 	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
         DEBIAN_FRONTEND=noninteractive apt-get install libgtk3* htop glances git apt-utils vim -y
-        DEBIAN_FRONTEND=noninteractive apt-get install libcurl3 -y
-        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger carta chgcentre ddfacet libidg pybdsf tirific python-pyfftw python3-pyfftw python-pyfftw-doc python3-pip xvfb factor miriad obit -y
+        DEBIAN_FRONTEND=noninteractive apt-get install -y
+        DEBIAN_FRONTEND=noninteractive apt-get install wsclean aoflagger carta chgcentre python3-idg pybdsf tirific python3-pyfftw idg-dev idg-doc libidg-api0 libidg-common0 libidg-cpu0 libidg-cuda0 libidg-external0 libidg-fft0 libidg-hybrid-cuda0 libidg-util0 libidg0 python3-idg python3-pyfftw-doc python3-pip xvfb obit fuse -y
 	DEBIAN_FRONTEND=noninteractive apt-get install dstat* wget git-lfs bash -y
         apt-get install -y build-essential cmake gfortran g++ gcc libncurses5-dev libreadline-dev flex bison libblas-dev liblapacke-dev wcslib-dev libcfitsio-dev emacs nano
-        apt-get install -y libhdf5-dev libfftw3-dev python-numpy-dev libboost-python-dev libpython3.6-dev libqt4-dev libpthread-stubs0-dev fort77 pthread* rsync
-	apt-get install -y nvidia-utils-470 lsof
-	pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose psutil ipywidgets ipyparallel bokeh scikit-learn gpustat
+        apt-get install -y libhdf5-dev libfftw3-dev python-numpy-dev libboost-python-dev libpython3-dev qtbase5-dev libpthread-stubs0-dev fort77 pthread* rsync
+	apt-get install -y libnvidia-compute-470 nvidia-utils-470 lsof
+	#pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose psutil ipywidgets ipyparallel bokeh scikit-learn gpustat
 
 	#Install imagemagick and prerequisites (useful for VLA CASA pipeline)
 	apt-get install -y php php-common gcc
@@ -110,8 +110,8 @@ From: ubuntu:18.04
 	export LC_CTYPE="en_US.UTF-8"
 	unset XDG_RUNTIME_DIR
 
-	export PATH="/conda/bin:$PATH"
 	export PATH="/$CASASTRING/bin:$PATH"
+	export PATH="/conda/bin:$PATH"
 	export PYTHONPATH="$CASAROOT/$CASA_ARCH/lib/python2.7/:$PYTHONPATH"
 	export LD_LIBRARY_PATH="$CASAROOT/$CASA_ARCH/lib:$LD_LIBRARY_PATH"
 	export CASA_ENABLE_TELEMETRY=false
