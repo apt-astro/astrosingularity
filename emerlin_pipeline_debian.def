@@ -75,7 +75,7 @@ Stage: build
     apt install -y wget gcc libxml2 libxml2-dev curl gpg-agent build-essential
     apt-get install -y wget apt-utils apt-transport-https git vim rsync lsb-* time
 
-    apt-get install -y python3-dev libyaml-dev python3-yaml python3-pip python3 python3-numpy
+    apt-get install -y python3-dev libyaml-dev python3-yaml python3-pip python3 python3-numpy python3-sphinx
     apt-get install -y casacore-dev libgsl-dev libhdf5-dev libfftw3-dev
     apt-get install -y casacore-data
     apt-get install -y libboost-dev libboost-date-time-dev libboost-test-dev
@@ -181,7 +181,12 @@ Stage: build
     cd /
     git clone https://github.com/DrWhatson/SelfCal.git
 
-  
+
+%test
+	. /conda/etc/profile.d/conda.sh
+	conda activate astroconda
+	python --version
+
 %labels
     Author: Alasdair Thomson & Bob Watson
     Version: 2.0

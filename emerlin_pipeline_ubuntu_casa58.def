@@ -54,11 +54,12 @@ From: ubuntu:20.04
 	bash conda.sh -b -p conda
 	. /conda/etc/profile.d/conda.sh
 	conda update -y -n root conda
+	conda update -n base -c defaults conda
 	conda update --all
 	conda config --add channels http://ssb.stsci.edu/astroconda
-	conda create -n astroconda python=3.6 stsci
+	conda create -n astroconda python=3.7 stsci
 	conda install -c conda-forge galsim astromatic-swarp astromatic-source-extractor astromatic-stiff -n astroconda
-	conda install -c pkgw-forge ds9
+	conda install -c pkgw-forge ds9 -n astroconda
 
 	#Install Bob Watson's self-calibration package and dependencies
 	git clone https://github.com/DrWhatson/SelfCal.git
@@ -112,7 +113,7 @@ From: ubuntu:20.04
 
 	export PATH="/$CASASTRING/bin:$PATH"
 	export PATH="/conda/bin:$PATH"
-	export PYTHONPATH="$CASAROOT/$CASA_ARCH/lib/python2.7/:$PYTHONPATH"
+	#export PYTHONPATH="$CASAROOT/$CASA_ARCH/lib/python2.7/:$PYTHONPATH"
 	export LD_LIBRARY_PATH="$CASAROOT/$CASA_ARCH/lib:$LD_LIBRARY_PATH"
 	export CASA_ENABLE_TELEMETRY=false
 
