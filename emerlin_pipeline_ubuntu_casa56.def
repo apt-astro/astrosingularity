@@ -2,7 +2,7 @@ BootStrap: library
 From: ubuntu:20.04
 
 %files
-	/home/alasdair/bin/astrosingularity/dowsclean_target.py /
+	dowsclean_target.py
 	dowsclean_calibrators.py
 	default_params_WIDE.json
 	default_params_LOWMEM.json
